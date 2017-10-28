@@ -43,7 +43,7 @@ v0.1 (05-12-2016)
 - Added four baseline models with varying amount of model complexity
 - Baselines 1 and 2 confirm that the batch norm layer on the output alone has a huge
   impact on system performance
-- Baseline 3 is the old approach using the first VGG block 
+- Baseline 3 is the old approach using the first VGG block
 """
 
 __author__ = "sschneider"
@@ -100,7 +100,7 @@ def build_baseline1_small(input_var):
 
 
 def build_baseline2_feats(input_var, nb_filter=96):
-    """ Slightly more complex model. Transform x to a feature space first 
+    """ Slightly more complex model. Transform x to a feature space first
     """
     net = OrderedDict()
 
@@ -589,7 +589,7 @@ def build_big_fan(input_var, nb_filter=96, input_size=(None,3,tools.INP_PSIZE,to
     return last, net
 
 ###
-# FULL LSTM Model
+# FULL Feature Aware Normalization Model
 def build_fan_reworked(input_var, nb_filter=16, input_size=(None,3,tools.INP_PSIZE,tools.INP_PSIZE)):
     net = OrderedDict()
 

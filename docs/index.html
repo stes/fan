@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="">
+        <meta name="author" content="">
+
+        <title>Normalization of Histological Stains using Deep Convolutional Features</title>
+
+        <!-- Bootstrap Core CSS -->
+        <link href="css/bootstrap.min.css" rel="stylesheet">
+
+        <!-- Custom CSS -->
+        <link href="css/landing-page.css" rel="stylesheet">
+
+        <!-- Custom Fonts -->
+        <link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+        <link href="http://www.lfb.rwth-aachen.de/wp-content/themes/s5_construction/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+
+
+        <!-- use the font -->
+        <style>
+body {
+    font-family: 'Roboto', sans-serif;
+    font-size: 12px;
+}
+        </style>
+
+        <script type="text/javascript" async
+                src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    </head>
+
+    <body>
+
+        <!-- Navigation -->
+        <nav class="navbar navbar-default navbar-fixed-top topnav" role="navigation">
+            <div class="container topnav">
+                <!-- Brand and toggle get grouped for better mobile display -->
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand topnav" href="#">Normalization of Histological Stains using Deep Convolutional Features</a>
+                </div>
+                <!-- Collect the nav links, forms, and other content for toggling -->
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                    <ul class="nav navbar-nav navbar-right">
+                        <li>
+                            <a href="#approach">Approach</a>
+                        </li>
+                        <li>
+                            <a href="#results">Results</a>
+                        </li>
+                        <li>
+                            <a href="#dataset">Dataset</a>
+                        </li>
+                    </ul>
+                </div>
+                <!-- /.navbar-collapse -->
+            </div>
+            <!-- /.container -->
+        </nav>
+
+
+        <!-- Header -->
+        <div class="intro-header">
+            <div class="container">
+
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="intro-message">
+                            <h1>Normalization of Histological Stains using Deep Convolutional Features</h1>
+                            <hr class="intro-divider">
+
+                            <ul class="list-inline banner-social-buttons">
+                                <!--
+                                <li>
+                                    <a href="blog.html" class="btn btn-default btn-lg"><i class="fa fa-link fa-fw"></i> <span class="network-name">Blog</span></a>
+                                </li>
+                                -->
+                                <li>
+                                    <a href="https://arxiv.org/abs/1708.04099" class="btn btn-default btn-lg"><i class="fa fa-file fa-fw"></i> <span class="network-name">Paper</span></a>
+                                </li>
+                                <li>
+                                    <a href="https://github.com/stes/fan" class="btn btn-default btn-lg"><i class="fa fa-github fa-fw"></i> <span class="network-name">Code</span></a>
+                                </li>
+                                <li>
+                                    <a href="https://github.com/stes/fan" class="btn btn-default btn-lg"><i class="fa fa-table fa-fw"></i> <span class="network-name">Dataset</span></a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <!-- /.container -->
+
+        </div>
+        <!-- /.intro-header -->
+
+        <!-- Page Content -->
+
+
+        <div class="content-section-b" id="approach">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-7 col-sm-6">
+                        <img class="img-responsive" src="img/net.svg" alt="">
+                    </div>
+                    <div class="col-lg-4 col-lg-offset-1 col-sm-6">
+                        <hr class="section-heading-spacer">
+                        <div class="clearfix"></div>
+                        <h2 class="section-heading">Deep Learning Based Normalization</h2>
+                        <p class="lead">
+                        We propose a novel network module called Feature Aware Normalization that can be incoporated into existing architectures.
+                        The module combines advantages of LSTM units and Batch Normalization.
+                        Scale and shift parameters are calculated on the fly using a pre-trained (and possibly finetuned) deep network.
+                        Retraining of as little as 30.000 parameters is required to adapt the algorithm to your dataset.
+                        </p>
+                    </div>
+
+                </div>
+
+            </div>
+            <!-- /.container -->
+
+        </div>
+        <!-- /.content-section-a -->
+        <!--        <div class="container">
+
+            <div class="row">
+                <div class="col-lg-6">
+                    <hr class="section-heading-spacer">
+                    <div class="clearfix"></div>
+                    <h2 class="section-heading">Abstract</h2>
+                    <p class="lead">
+                    While human observers are able to cope with variations in color and appearance of histological stains, digital pathology algorithms commonly require a well-normalized setting to achieve peak performance, especially when a limited amount of labeled data is available.
+                    This work provides a fully automated, end-to-end learning-based setup for normalizing histological stains, which considers the texture context of the tissue.
+                    We introduce Feature Aware Normalization, which extends the framework of batch normalization in combination with gating elements from Long Short-Term Memory units for normalization among different spatial regions of interest.
+                    By incorporating a pretrained deep neural network as feature extractor steering a pixelwise processing pipeline, we achieve excellent normalization results and ensure a consistent representation of color and texture.
+                    The evaluation comprises a comparison of color histogram deviations, structural similarity and measures the
+                    color space sizes of the different methods.
+                    </p>
+                </div>
+                <div class="col-lg-6">
+                    <p class="lead">
+                    <ul class="list-inline banner-social-buttons">
+                                <!li>
+                                    <a href="blog.html" class="btn btn-default btn-lg"><i class="fa fa-link fa-fw"></i> <span class="network-name">Blog</span></a>
+                                </li>
+                                <li>
+                                    <a href="https://github.com/stes/fan" class="btn btn-default btn-lg"><i class="fa fa-file fa-fw"></i> <span class="network-name">Paper</span></a>
+                                </li>
+                                <li>
+                                    <a href="https://github.com/stes/fan" class="btn btn-default btn-lg"><i class="fa fa-github fa-fw"></i> <span class="network-name">Code</span></a>
+                                </li>
+                                <li>
+                                    <a href="https://github.com/stes/fan" class="btn btn-default btn-lg"><i class="fa fa-table fa-fw"></i> <span class="network-name">Dataset</span></a>
+                                </li>
+                    </ul>
+                    </p>
+                </div>
+            </div>
+        <!/div>
+
+        <!-- >
+        <div class="content-section-b" id="overview">
+
+            <div class="container">
+
+                <div class="row">
+                    <div class="col-lg-5 col-lg-offset-1 col-sm-push-6  col-sm-6">
+                        <hr class="section-heading-spacer">
+                        <div class="clearfix"></div>
+                        <h2 class="section-heading">Feature Aware Normalization</h2>
+                        <p class="lead">
+                        The module combines advantages of LSTM units and Batch Normalization.
+                        Scale and shift parameters are calculated on the fly using a pre-trained (and possibly finetuned) deep network.
+                        Retraining of as little as 30.000 parameters is required.
+                        </p>
+                    </div>
+                    <div class="col-lg-5 col-sm-pull-6  col-sm-6">
+                        <img class="img-responsive" src="img/fan.svg" alt="">
+                    </div>
+                </div>
+
+            </div>
+            <!-- /.container -->
+
+        </div>
+        <!-- /.content-section-b -->
+
+        <div class="content-section-a" id="results">
+
+            <div class="container">
+
+                <div class="row">
+                    <div class="col-lg-5 col-sm-6">
+                        <hr class="section-heading-spacer">
+                        <div class="clearfix"></div>
+                        <h2 class="section-heading">Fast and Consistent Normalization Results</h2>
+                        <p class="lead">
+                        Feature Aware Normalization is fast, improves significantly on previous approaches and can easily be adapted to new problems, especially when Deep Networks are used for further processing.
+                        </p>
+                        <ul class="list-inline">
+                            <li>
+                                <a href="https://github.com/stes/fan" class="btn btn-default btn-lg"><i class="fa fa-github fa-fw"></i> <span class="network-name">Code</span></a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-5 col-lg-offset-2 col-sm-6">
+                        <div class="juxtapose">
+                            <img width=480px src="img/BAS_unnormalized_A.jpg" data-label="Unnormalizd"/>
+                            <img width=480px src="img/FAN_HoEoTp_A.jpg" data-label="FAN Normalized"/>
+                        </div>
+                        <script src="https://cdn.knightlab.com/libs/juxtapose/latest/js/juxtapose.min.js"></script>
+                        <link rel="stylesheet" href="https://cdn.knightlab.com/libs/juxtapose/latest/css/juxtapose.css">
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <!-- /.container -->
+
+        </div>
+        <!-- /.content-section-a -->
+
+        <div class="content-section-b" id="dataset">
+
+            <div class="container">
+
+                <div class="row">
+                    <div class="col-lg-5 col-lg-offset-1 col-sm-push-6  col-sm-6">
+                        <hr class="section-heading-spacer">
+                        <div class="clearfix"></div>
+                        <h2 class="section-heading">ILUMINATE Image Normalization Dataset</h2>
+                        <p class="lead">
+                        To benchmark normalization algorithms, we provide the full validation dataset used in our experiments.
+                        The dataset consists of five different blocks of tissue, each seperated into nine subsequent cuts with different color characteristics.
+                        For each combination, we provide five images of size 2000x2000, yielding a total of 225 images. 
+                        </p>
+                        <ul class="list-inline banner-social-buttons">
+                            <li>
+                                <a href="https://github.com/stes/fan" class="btn btn-default btn-lg"><i class="fa fa-table fa-fw"></i> <span class="network-name">Dataset</span></a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-5 col-sm-pull-6  col-sm-6">
+                        <!--
+                        <span data-role="rollover" data-ic-transition="slide">
+                            <span class="ic-image" style="position:relative; display:inline-block; /display:inline;">
+                                <img src="img/BAS_unnormalized_A.jpg" atl="image" class="ic-off" style="position: relative; z-index: 2; opacity: 1;">
+                                <img src="img/BAS_unnormalized_B.jpg" atl="image" class="ic-on" style="position: absolute; z-index: 1; top: 0px; left: 0px; opacity: 1;">
+                            </span>
+                        </span>
+                        -->
+
+                        <img class="img-responsive" src="img/BAS_unnormalized_B.jpg" alt="">
+                        <img class="img-responsive" src="img/BAS_unnormalized_C.jpg" alt="">
+                    </div>
+                </div>
+
+            </div>
+            <!-- /.container -->
+
+        </div>
+        <!-- /.content-section-b -->
+
+        <!-- Footer -->
+        <footer>
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <ul class="list-inline">
+                            <li>
+                                <a href="#">Home</a>
+                            </li>
+                            <li class="footer-menu-divider">&sdot;</li>
+                            <li>
+                            <a href="#approach">Approach</a>
+                            </li>
+                            <li class="footer-menu-divider">&sdot;</li>
+                            <li>
+                                <a href="#results">Results</a>
+                            </li>
+                            <li class="footer-menu-divider">&sdot;</li>
+                            <li>
+                                <a href="#dataset">Dataset</a>
+                            </li>
+                            <li class="footer-menu-divider">&sdot;</li>
+                            <li>
+                                <a href="lfb.rwth-aachen.de/impressum">Impressum</a>
+                            </li>
+                        </ul>
+                        <p class="copyright text-muted small">Copyright &copy; Institute of Imaging and Computer Vision, RWTH Aachen (2017)</p>
+                    </div>
+                </div>
+            </div>
+        </footer>
+
+        <!-- jQuery -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <script type="text/javascript" src="js/jquery.image-changer.min.js"></script>
+        <script type="text/javascript">
+            $("[data-role='rollover']").imageChanger({
+              transition: {type: "slide", "direction": "right"}
+            });
+        </script>
+
+        <!-- Bootstrap Core JavaScript -->
+        <script src="js/bootstrap.min.js"></script>
+
+    </body>
+
+</html>

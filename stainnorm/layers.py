@@ -12,19 +12,19 @@ from theano import tensor as T
 import pickle
 
 import lasagne as nn
-from lasagne.layers import ElemwiseSumLayer, ElemwiseMergeLayer
-from lasagne.layers import InputLayer, DenseLayer, NonlinearityLayer, BiasLayer, BatchNormLayer
+from lasagne.layers import ElemwiseSumLayer, ElemwiseMergeLayer, InputLayer,\
+                           DenseLayer, NonlinearityLayer, BiasLayer, \
+                           BatchNormLayer, Upscale2DLayer, ExpressionLayer, \
+                           TransposedConv2DLayer
 from lasagne.layers import Pool2DLayer as PoolLayer
 from lasagne.layers.dnn import Conv2DDNNLayer as ConvLayer
-from lasagne.layers import Upscale2DLayer
-from lasagne.layers import ExpressionLayer, TransposedConv2DLayer
 from lasagne.nonlinearities import rectify, linear
 from lasagne.nonlinearities import sigmoid, tanh
 import h5py
 
 
-###-------------------------------------------------------------------------------- 
-# SSIM measure
+###--------------------------------------------------------------------------------
+# Implementation of SSIM measure in Theano
 
 from scipy.ndimage.filters import gaussian_filter, uniform_filter
 from theano.tensor.signal import conv
@@ -60,14 +60,14 @@ def compare_ssim(X, Y, win_size=None, gradient=False,
     K1 = kwargs.pop('K1', 0.01)
     K2 = kwargs.pop('K2', 0.03)
     sigma = kwargs.pop('sigma', 1.5)
-    
+
     if K1 < 0:
         raise ValueError("K1 must be positive")
     if K2 < 0:
         raise ValueError("K2 must be positive")
     if sigma < 0:
         raise ValueError("sigma must be positive")
-    
+
     use_sample_covariance = kwargs.pop('use_sample_covariance', True)
 
     if win_size is None:
@@ -84,7 +84,7 @@ def compare_ssim(X, Y, win_size=None, gradient=False,
 
     ndim = X.ndim
 
-    
+
     if gaussian_weights:
         filters = get_gaussian(sigma, 13)
     else:
@@ -194,7 +194,7 @@ def transpose(incoming, conv, nonlinearity, *args, **kwargs):
                                  **kwargs)
 
 def upsample_bilinear(layer, nb_kernels, ratio=2):
-    """ 
+    """
     """
 
     def build_bilinear_kernel(ratio):
@@ -205,20 +205,21 @@ def upsample_bilinear(layer, nb_kernels, ratio=2):
         kern = kern[:,np.newaxis] * kern[np.newaxis, :]
         return kern
 
-    kernel = build_bilinear_kernel(ratio=ratio) 
+    kernel = build_bilinear_kernel(ratio=ratio)
     kernel_shape = (nb_kernels, nb_kernels) + kernel.shape
     W_init = np.zeros(kernel_shape)
     W_init[range(nb_kernels), range(nb_kernels), :, :] = kernel
     W_init = theano.shared(np.float32(W_init))
 
-    return nn.layers.TransposedConv2DLayer(layer, nb_kernels, ratio*2+1, stride=(ratio, ratio), W=W_init, b=None, nonlinearity=None) 
+    return nn.layers.TransposedConv2DLayer(layer, nb_kernels, ratio*2+1, stride=(ratio, ratio), W=W_init, b=None, nonlinearity=None)
 
 
 ###--------------------------------------------------------------------------------
 # LSTM unit
 
-
 def upsample(layer, scale, mode="repeat"):
+    """ Upsampling by repetition or bilinear upsampling
+    """
     if mode in ["repeat", "dilate"]:
         return Upscale2DLayer(layer, scale, mode=mode)
     elif mode in ["bilinear"]:
@@ -227,9 +228,9 @@ def upsample(layer, scale, mode="repeat"):
     raise ValueError("Invalid mode: " + str(mode))
 
 
-def lstm_module_simple(inp, net, prefix, features, nb_filter, scale, upsampling_strategy="repeat"):
+def fan_module_simple(inp, net, prefix, features, nb_filter, scale, upsampling_strategy="repeat"):
     r""" Implementation for simple LSTM block for feature based manipulation
-    
+
     Takes input x and features and performs pixelwise manipulation of inp:
     $$
     y = x \sigma(f(z)) + \tanh(g(z)) (1 - \sigma(f(z)))
@@ -265,9 +266,9 @@ def lstm_module_simple(inp, net, prefix, features, nb_filter, scale, upsampling_
 
     return x_added
 
-def lstm_module_improved(inp, net, prefix, features, nb_filter, scale, upsampling_strategy="repeat"):
+def fan_module_improved(inp, net, prefix, features, nb_filter, scale, upsampling_strategy="repeat"):
     r""" Implementation for simple LSTM block for feature based manipulation
-    
+
     Takes input x and features and performs pixelwise manipulation of inp:
     $$
     y = x \sigma(f(z)) + \tanh(g(z)) (1 - \sigma(f(z)))
@@ -303,7 +304,7 @@ def lstm_module_improved(inp, net, prefix, features, nb_filter, scale, upsamplin
 
 
 ###--------------------------------------------------------------------------------
-# Normalizer Network(s)
+# Normalizer Networks
 
 def normalize(x):
     """ Normalize the given tensor for use with the VGG networks
@@ -359,235 +360,5 @@ def get_features(inp_layer, pad=0):
 
     values = pickle.load(open('vgg19_normalized.pkl', 'rb'), encoding='latin1')['param values']
     nn.layers.set_all_param_values(net['conv4_4'], values[:nb_params])
-
-    return net
-
-
-### -----------------------------------------------------------------------------
-### RESNET Code, borrowed from https://github.com/stes/deepml/blob/master/recipes/resnet.py
-
-class NonUpdateBatchNormLayer(BatchNormLayer):
-    """ BN Layer that only uses statistics computed on the current batch
-    """
-
-    def __init__(self, incoming, *args, **kwargs):
-        super(NonUpdateBatchNormLayer, self).__init__(incoming, *args, **kwargs)
-    
-    def get_output_for(self, input, **kwargs):
-        return super(NonUpdateBatchNormLayer, self).get_output_for(input, batch_norm_use_averages=False, batch_norm_update_averages=False, **kwargs)
-
-class FixedBatchNormLayer(BatchNormLayer):
-    """ BN Layer using fixed statistics, with no updates applied to the statistics based on the data
-    """
-
-    def __init__(self, incoming, *args, **kwargs):
-        super(FixedBatchNormLayer, self).__init__(incoming, *args, **kwargs)
-    
-    def get_output_for(self, input, deterministic=True, **kwargs):
-        return super(FixedBatchNormLayer, self).get_output_for(input, deterministic=True, **kwargs)
-
-
-
-def get_resnet50(input_layer):
-    """ Build a feature encoder module using the ResNet-x architecture
-    Parameters
-    ----------
-    input_layer : Lasagne layer serving the input to this network module
-    net : dict (recommended is collections.OrderedDict) to collect layers
-    variant : str, one of "resnet50", "resnet101", "resnet152"
-    """
-    net = OrderedDict()
-    
-    def load_weights(fname, net):
-        with h5py.File(fname, "r") as ds:
-            print('loading weights from', fname)
-            for key in net.keys():
-                try:
-                    # print("Entering group", key)
-                    grp = ds[key]
-                    for param in net[key].params.keys():
-                        p = grp[str(param)]
-
-                        param_shape = param.get_value(borrow=True).shape
-                        value_shape = p.shape
-
-                        # print("Adapting:", key, param)
-                        param.set_value(p[...])
-                        assert (param.get_value() == p[...]).all()
-                        # print("\tSuccess.")
-                except:
-                # except Exception as e:
-                    pass
-                    # print('ERROR in build_enconder/load_weights', e)
-
-    def build_simple_block(incoming_layer, names,
-                           num_filters, filter_size, stride, pad,
-                           use_bias=False, nonlin=rectify):
-        """Creates stacked Lasagne layers ConvLayer -> BN -> (ReLu)
-        Parameters:
-        ----------
-        incoming_layer : instance of Lasagne layer
-            Parent layer
-        names : list of string
-            Names of the layers in block
-        num_filters : int
-            Number of filters in convolution layer
-        filter_size : int
-            Size of filters in convolution layer
-        stride : int
-            Stride of convolution layer
-        pad : int
-            Padding of convolution layer
-        use_bias : bool
-            Whether to use bias in conlovution layer
-        nonlin : function
-            Nonlinearity type of Nonlinearity layer
-        Returns
-        -------
-        tuple: (net, last_layer_name)
-            net : dict
-                Dictionary with stacked layers
-            last_layer_name : string
-                Last layer name
-        """
-        net = []
-        names = list(names)
-        net.append((
-            names[0],
-            ConvLayer(incoming_layer, num_filters, filter_size, pad, stride,
-                      flip_filters=False, nonlinearity=None) if use_bias
-            else ConvLayer(incoming_layer, num_filters, filter_size, stride, pad, b=None,
-                           flip_filters=False, nonlinearity=None)
-        ))
-
-        net.append((
-            names[1],
-            FixedBatchNormLayer(net[-1][1])
-        ))
-        if nonlin is not None:
-            net.append((
-                names[2],
-                NonlinearityLayer(net[-1][1], nonlinearity=nonlin)
-            ))
-
-        return dict(net), net[-1][0]
-
-    def build_residual_block(incoming_layer, ratio_n_filter=1.0, ratio_size=1.0, has_left_branch=False,
-                             upscale_factor=4, ix=''):
-        """Creates two-branch residual block
-        Parameters:
-        ----------
-        incoming_layer : instance of Lasagne layer
-            Parent layer
-        ratio_n_filter : float
-            Scale factor of filter bank at the input of residual block
-        ratio_size : float
-            Scale factor of filter size
-        has_left_branch : bool
-            if True, then left branch contains simple block
-        upscale_factor : float
-            Scale factor of filter bank at the output of residual block
-        ix : int
-            Id of residual block
-        Returns
-        -------
-        tuple: (net, last_layer_name)
-            net : dict
-                Dictionary with stacked layers
-            last_layer_name : string
-                Last layer name
-        """
-        simple_block_name_pattern = ['res%s_branch%i%s', 'bn%s_branch%i%s', 'res%s_branch%i%s_relu']
-
-        net = OrderedDict()
-
-        # right branch
-        net_tmp, last_layer_name = build_simple_block(
-            incoming_layer, map(lambda s: s % (ix, 2, 'a'), simple_block_name_pattern),
-            int(nn.layers.get_output_shape(incoming_layer)[1] * ratio_n_filter), 1, int(1.0 / ratio_size), 0)
-        net.update(net_tmp)
-
-        net_tmp, last_layer_name = build_simple_block(
-            net[last_layer_name], map(lambda s: s % (ix, 2, 'b'), simple_block_name_pattern),
-            nn.layers.get_output_shape(net[last_layer_name])[1], 3, 1, 1)
-        net.update(net_tmp)
-
-        net_tmp, last_layer_name = build_simple_block(
-            net[last_layer_name], map(lambda s: s % (ix, 2, 'c'), simple_block_name_pattern),
-            nn.layers.get_output_shape(net[last_layer_name])[1] * upscale_factor, 1, 1, 0,
-            nonlin=None)
-        net.update(net_tmp)
-
-        right_tail = net[last_layer_name]
-        left_tail = incoming_layer
-
-        # left branch
-        if has_left_branch:
-            net_tmp, last_layer_name = build_simple_block(
-                incoming_layer, map(lambda s: s % (ix, 1, ''), simple_block_name_pattern),
-                int(nn.layers.get_output_shape(incoming_layer)[1] * 4 * ratio_n_filter), 1, int(1.0 / ratio_size), 0,
-                nonlin=None)
-            net.update(net_tmp)
-            left_tail = net[last_layer_name]
-
-        net['res%s' % ix] = ElemwiseSumLayer([left_tail, right_tail], coeffs=1)
-        net['res%s_relu' % ix] = NonlinearityLayer(net['res%s' % ix], nonlinearity=rectify)
-
-        return net, 'res%s_relu' % ix
-
-    net['input'] = input_layer
-
-    # BLOCK1 begins here
-    sub_net, parent_layer_name = build_simple_block(
-        net['input'], ['conv1', 'bn_conv1', 'conv1_relu'],
-        64, 7, 3, 2, use_bias=True)
-    net.update(sub_net)
-    net['pool1'] = PoolLayer(net[parent_layer_name], pool_size=3, stride=2, pad=0, mode='max', ignore_border=False)
-    parent_layer_name = 'pool1'
-
-    # BLOCK2 begins here
-    block_size = list('abc')
-    for c in block_size:
-        if c == 'a':
-            sub_net, parent_layer_name = build_residual_block(net[parent_layer_name], 1, 1, True, 4, ix='2%s' % c)
-        else:
-            sub_net, parent_layer_name = build_residual_block(net[parent_layer_name], 1.0 / 4, 1, False, 4,
-                                                              ix='2%s' % c)
-        net.update(sub_net)
-
-    # BLOCK3 begins here
-    block_size = list('abcd')
-    for c in block_size:
-        if c == 'a':
-            sub_net, parent_layer_name = build_residual_block(
-                net[parent_layer_name], 1.0 / 2, 1.0 / 2, True, 4, ix='3%s' % c)
-        else:
-            sub_net, parent_layer_name = build_residual_block(net[parent_layer_name], 1.0 / 4, 1, False, 4,
-                                                              ix='3%s' % c)
-        net.update(sub_net)
-
-    # BLOCK4 begins here
-    block_size = list('abcdef')
-    for c in block_size:
-        if c == 'a':
-            sub_net, parent_layer_name = build_residual_block(
-                net[parent_layer_name], 1.0 / 2, 1.0 / 2, True, 4, ix='4%s' % c)
-        else:
-            sub_net, parent_layer_name = build_residual_block(net[parent_layer_name], 1.0 / 4, 1, False, 4,
-                                                              ix='4%s' % c)
-        net.update(sub_net)
-
-    # BLOCK5 begins here
-    block_size = list('abc')
-    for c in block_size:
-        if c == 'a':
-            sub_net, parent_layer_name = build_residual_block(
-                net[parent_layer_name], 1.0 / 2, 1.0 / 2, True, 4, ix='5%s' % c)
-        else:
-            sub_net, parent_layer_name = build_residual_block(net[parent_layer_name], 1.0 / 4, 1, False, 4,
-                                                              ix='5%s' % c)
-        net.update(sub_net)
-
-    load_weights('resnet50.hdf5', net)
 
     return net
