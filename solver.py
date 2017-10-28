@@ -8,7 +8,7 @@ This script is called by
 >>> python solver.py [model_id ...]
 
 Currently, four baseline models for stain normalization are implemented, details are given
-in ``models.py``. To optimize model 2 and 4, just call 
+in ``models.py``. To optimize model 2 and 4, just call
 
 >>> python solver.py 2 4
 """
@@ -50,20 +50,20 @@ def netdump(layers):
 def compile_validation(constructor, psize):
   """ compile network using layer-specific learning rates and penalties
   """
-  input_var = T.tensor4("input")  
+  input_var = T.tensor4("input")
 
   network, layers = constructor(input_var, input_size=(1,3,psize,psize))
 
   #test_prediction = nn.layers.get_output(network, deterministic=True, batch_norm_use_averages=False, batch_norm_update_averages=False)
   test_prediction = nn.layers.get_output(network, deterministic=True)
   val_fn = theano.function([input_var], [test_prediction], allow_input_downcast=True)
-  
+
   return val_fn, network, layers
 
 def compile(constructor, learning_rates, penalties, optimizer=nn.updates.nesterov_momentum):
   """ compile network using layer-specific learning rates and penalties
   """
-  input_var = T.tensor4("input")  
+  input_var = T.tensor4("input")
   target_var = T.tensor4("targets")
 
   network, layers = constructor(input_var)
@@ -120,12 +120,12 @@ def run_solver(train_fn, network, layers, experiment_id, timestamp=None,
   if timestamp is None: timestamp = time.time()
 
   X, Xv = get_dataset(train_key=dataset, val_key=["H.E.T-", "H.E-T.", "H+E+T."])
-    
+
   regularize_name = lambda s : s.replace("+","p").replace("-","m").replace(".","o")
   savedir = tools.require_dir("{}_{}_{}".format(str(dir_prefix), regularize_name(str(dataset)), str(timestamp)))
 
   log.info("Loaded dataset with %d training and %d validation images", len(X), len(Xv))
-  
+
   datagen = PCAIterator(np.concatenate((X[200:], Xv[200:]),axis=0))
 
   tools.OUT_PSIZE = nn.layers.get_output_shape(network)[2]
@@ -146,7 +146,7 @@ def run_solver(train_fn, network, layers, experiment_id, timestamp=None,
         error, loss, reg, pred = train_fn(inputs, tools.crop(targets))
         pmin, pmean, pmax = pred.min(), pred.mean(), pred.max()
         batch += 1
-        
+
         ## TRAINING OUTPUT ##
         if batch % save_batch_freq == 0 or time.time() - snap > save_time_freq:
           outp_image = [np.clip(tools.panelize(pp), 0, 255).astype("uint8") for pp in \
@@ -166,7 +166,7 @@ def run_solver(train_fn, network, layers, experiment_id, timestamp=None,
 
         ## VALIDATION OUTPUT ##
         if time.time() - val_snap > save_time_freq:
-          log.info("Start validation run")        
+          log.info("Start validation run")
           try:
             for inputs, targets in datagen.iterate(Xv, batch_size=64, shuffle=False, augment=False):
               loss, pred = pred_fn(inputs, tools.crop(targets))
@@ -181,7 +181,7 @@ def run_solver(train_fn, network, layers, experiment_id, timestamp=None,
 
               if time.time() - val_snap > save_time_freq //10:
                 break
-            log.info("Finished validation run")          
+            log.info("Finished validation run")
           except:
             log.exception("Error in validation run. Continue training.")
 
@@ -214,7 +214,7 @@ if __name__ == '__main__':
 
   import sys
   import argparse
-  from tools import logger_setup
+  from stainnorm.tools import logger_setup
 
   parser = argparse.ArgumentParser(description='Run experiments')
   parser.add_argument("-m", '--model', nargs="+",
@@ -240,7 +240,7 @@ if __name__ == '__main__':
   modellist =      [build_baseline1_small,                # 1
                     build_baseline2_feats,                # 2
                     build_baseline3_vgg,                  # 3
-                    build_baseline4_lstm,                 # 4 
+                    build_baseline4_lstm,                 # 4
                     build_baseline5_fan,                  # 5
                     build_baseline6_lstm_fan,             # 6
                     build_resnet7_lstm,                   # 7

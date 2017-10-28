@@ -50,23 +50,27 @@ __author__ = "sschneider"
 __email__ = "steffen.schneider@rwth-aachen.de"
 
 from collections import OrderedDict
+import pickle
 
 import lasagne as nn
 from lasagne.layers import InputLayer, NonlinearityLayer, BatchNormLayer
-# from lasagne.layers import Pool2DLayer as PoolLayer
-from lasagne.layers.dnn import Pool2DDNNLayer as PoolLayer
-from lasagne.layers.dnn import Conv2DDNNLayer as ConvLayer
+try:
+    from lasagne.layers.dnn import Pool2DDNNLayer as PoolLayer
+    from lasagne.layers.dnn import Conv2DDNNLayer as ConvLayer
+except:
+    print("Failed to use GPU implementations of Conv and Pool Layers")
+    from lasagne.layers import Pool2DLayer as PoolLayer
+    from lasagne.layers import Conv2DLayer as ConvLayer
+
 from lasagne.layers import Upscale2DLayer
 from lasagne.layers import ExpressionLayer, TransposedConv2DLayer
 from lasagne.nonlinearities import rectify, linear
 from lasagne.layers import get_output_shape
 
-import layers
-from layers import fan_module_simple, fan_module_improved
-from layers import get_features, normalize, transpose, get_resnet50
-from featurenorm import FeatureAwareNormLayer
-import pickle
-import tools
+from . import layers, tools
+from .layers import fan_module_simple, fan_module_improved
+from .layers import get_features, normalize, transpose, get_resnet50
+from .featurenorm import FeatureAwareNormLayer
 
 __all__ = ['build_baseline1_small',
            'build_baseline2_feats',

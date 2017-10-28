@@ -43,6 +43,9 @@ In the latter case, the path should contain a placeholder (``{}``).
 
 """
 
+__author__ = ["Daniel Bug", "Steffen Schneider"]
+__email__  = ["steffen.schneider (at) rwth-aachen.de"]
+
 import matplotlib as mpl
 
 mpl.use("agg")
@@ -385,9 +388,9 @@ def boxplot_similarity(dfs, measures='ssim', *args, **kwargs):
 
 
 def scatterplot(dfs, methods=["reinhard", "marcenko", "kahn", 'umc', "lstm_reworked"], metrics =['SSD', 'EMD', 'KLD', 'KST']):
-        
+
     plt.figure(figsize=(4*len(metrics), 3))
-    
+
     # use different markers for the algorithms
     # use diffrent colors for the protocols
 
@@ -399,31 +402,31 @@ def scatterplot(dfs, methods=["reinhard", "marcenko", "kahn", 'umc', "lstm_rewor
         # protocols are different colors
         plt.subplot(1, len(metrics), i+1)
         plt.title(metric)
-        
+
         plots_methods = []
         plots_protocols = []
-        
+
         for protocol_id, protocol in enumerate(dfs.keys()):
-            # methods are different markers 
+            # methods are different markers
             for m, method in zip(markers, methods):
                 data = np.concatenate(dfs[protocol][method].as_matrix(columns=[metric]), axis=0)
                 assert data.ndim == 1, data.ndim
                 # data is (2700,) matrix
                 means, std = data.mean(), data.std()
                 scat = plt.scatter(means, std, s=30,c=colors[protocol_id], marker=m)
-                
+
                 if protocol_id==0:
                     plots_methods.append(scat)
-            
+
             plots_protocols.append(scat)
-                
+
         if i == len(metrics) - 1:
             plt.legend(plots_methods + plots_protocols,
                methods + list(dfs.keys()),
                 loc="right",
                 bbox_to_anchor=(1.7, 0.5),
                scatterpoints=1)
-    
+
     return plt
 
 def boxplot(df_BAS, df_REI, df_MAR, df_KHN, df_FAN, *args, **kwargs):
@@ -649,7 +652,7 @@ if __name__ == '__main__':
             plt = boxplot(prdf["unnormalized"], prdf["reinhard"], prdf["marcenko"], prdf["kahn"], prdf["lstm_reworked"])
             sns.despine()
             plt.savefig(get_plotname(cfg,"boxplot-protocolwise", "comparison", protocol),
-                    bbox_inches="tight") 
+                    bbox_inches="tight")
             plt.close()
 
         if plot_opts["patchwise"]:
@@ -657,49 +660,36 @@ if __name__ == '__main__':
             plt = boxplot(ptch["unnormalized"], ptch["reinhard"], ptch["marcenko"], ptch["kahn"],
                     ptch["lstm_reworked"], showfliers=False)
             plt.savefig(get_plotname(cfg,"boxplot-patchwise", "comparison", protocol),
-                    bbox_inches="tight") 
+                    bbox_inches="tight")
             sns.despine()
             plt.close()
-        
-        #TODO keep this? somehow broken
-        #set_style()
-        #plt = boxplot(avg["unnormalized"], avg["reinhard"], avg["marcenko"], avg["lstm_reworked"], showfliers=False)
-        #pltname = op.join(cfg["plot_directory"], "boxplot-meanhistogram-{}.pdf".format(protocol))
-        #plt.savefig(pltname, bbox_inches="tight") 
-        # plt.close()
-
-        #set_style()
-        #plt = boxplot_lab_volumes(ssim)
-        #pltname = op.join(cfg["plot_directory"], "boxplot-labvolume-{}.pdf".format(protocol))
-        #plt.savefig(pltname, bbox_inches="tight") 
-        #plt.close()
 
         if plot_opts["ssim"]:
             set_style()
             plt = boxplot_similarity(ssim)
             pltname = op.join(cfg["plot_directory"], "boxplot-ssim-{}.pdf".format(protocol))
-            plt.savefig(get_plotname(cfg,"ssim-lab", "comparison", protocol), bbox_inches="tight") 
+            plt.savefig(get_plotname(cfg,"ssim-lab", "comparison", protocol), bbox_inches="tight")
             sns.despine()
             plt.close()
-        
+
         if plot_opts["histograms"]:
-            for method, _ in cfg["method_directories"].items(): 
+            for method, _ in cfg["method_directories"].items():
                 set_style()
                 plotHistograms_(hists[method])
-                plt.savefig(get_plotname(cfg,"histogram", method, protocol), bbox_inches="tight") 
+                plt.savefig(get_plotname(cfg,"histogram", method, protocol), bbox_inches="tight")
                 plt.close()
 
     if plot_opts["scatter"]:
         set_style()
         plt = scatterplot(metrics_prdf)
         pltname = op.join(cfg["plot_directory"], "scatterplot-metrics.pdf")
-        plt.savefig(pltname, bbox_inches="tight") 
+        plt.savefig(pltname, bbox_inches="tight")
         sns.despine()
         plt.close()
 
         set_style()
         plt = scatterplot(metrics_ssim, metrics = ['ssim', 'lab_volume'])
         pltname = op.join(cfg["plot_directory"], "scatterplot-ssim-lab.pdf")
-        plt.savefig(pltname, bbox_inches="tight") 
+        plt.savefig(pltname, bbox_inches="tight")
         sns.despine()
         plt.close()

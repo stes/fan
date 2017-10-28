@@ -8,19 +8,25 @@ from collections import OrderedDict
 import pickle
 import numpy as np
 import theano
-from theano import tensor as T
 import pickle
+import h5py
+
+from theano import tensor as T
 
 import lasagne as nn
 from lasagne.layers import ElemwiseSumLayer, ElemwiseMergeLayer, InputLayer,\
                            DenseLayer, NonlinearityLayer, BiasLayer, \
                            BatchNormLayer, Upscale2DLayer, ExpressionLayer, \
                            TransposedConv2DLayer
-from lasagne.layers import Pool2DLayer as PoolLayer
-from lasagne.layers.dnn import Conv2DDNNLayer as ConvLayer
+try:
+    from lasagne.layers.dnn import Pool2DDNNLayer as PoolLayer
+    from lasagne.layers.dnn import Conv2DDNNLayer as ConvLayer
+except:
+    print("Failed to use GPU implementations of Conv and Pool Layers")
+    from lasagne.layers import Pool2DLayer as PoolLayer
+    from lasagne.layers import Conv2DLayer as ConvLayer
 from lasagne.nonlinearities import rectify, linear
 from lasagne.nonlinearities import sigmoid, tanh
-import h5py
 
 
 ###--------------------------------------------------------------------------------
@@ -303,6 +309,26 @@ def fan_module_improved(inp, net, prefix, features, nb_filter, scale, upsampling
     return x_added
 
 
+class NonUpdateBatchNormLayer(BatchNormLayer):
+    """ BN Layer that only uses statistics computed on the current batch
+    """
+
+    def __init__(self, incoming, *args, **kwargs):
+        super(NonUpdateBatchNormLayer, self).__init__(incoming, *args, **kwargs)
+
+    def get_output_for(self, input, **kwargs):
+        return super(NonUpdateBatchNormLayer, self).get_output_for(input, batch_norm_use_averages=False, batch_norm_update_averages=False, **kwargs)
+
+class FixedBatchNormLayer(BatchNormLayer):
+    """ BN Layer using fixed statistics, with no updates applied to the statistics based on the data
+    """
+
+    def __init__(self, incoming, *args, **kwargs):
+        super(FixedBatchNormLayer, self).__init__(incoming, *args, **kwargs)
+
+    def get_output_for(self, input, deterministic=True, **kwargs):
+        return super(FixedBatchNormLayer, self).get_output_for(input, deterministic=True, **kwargs)
+
 ###--------------------------------------------------------------------------------
 # Normalizer Networks
 
@@ -358,7 +384,7 @@ def get_features(inp_layer, pad=0):
 
     nb_params = len(nn.layers.get_all_params(net['conv4_4']))
 
-    values = pickle.load(open('vgg19_normalized.pkl', 'rb'), encoding='latin1')['param values']
+    values = pickle.load(open('weights/vgg19_normalized.pkl', 'rb'), encoding='latin1')['param values']
     nn.layers.set_all_param_values(net['conv4_4'], values[:nb_params])
 
     return net

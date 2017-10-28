@@ -12,21 +12,31 @@ and
 ```
 """
 
+import os, pickle
 from collections import OrderedDict
 
+import numpy as np
+
+import theano
+import theano.tensor as T
 import lasagne as nn
 from lasagne.layers import InputLayer, NonlinearityLayer, BatchNormLayer
-from lasagne.layers.dnn import Pool2DDNNLayer as PoolLayer
-from lasagne.layers.dnn import Conv2DDNNLayer as ConvLayer
 from lasagne.layers import Upscale2DLayer
 from lasagne.layers import ExpressionLayer, TransposedConv2DLayer
+try:
+    from lasagne.layers.dnn import Pool2DDNNLayer as PoolLayer
+    from lasagne.layers.dnn import Conv2DDNNLayer as ConvLayer
+except:
+    print("Failed to use GPU implementations of Conv and Pool Layers")
+    from lasagne.layers import Pool2DLayer as PoolLayer
+    from lasagne.layers import Conv2DLayer as ConvLayer
+
 from lasagne.nonlinearities import rectify, linear
 from lasagne.layers import get_output_shape
 
-import layers
-from layers import fan_module_simple, get_features, normalize, transpose, fan_module_improved
-import pickle
-import tools
+from . import layers, tools
+from .layers import fan_module_simple, get_features, normalize, transpose, \
+                    fan_module_improved
 
 
 def build_network(input_var, nb_filter=16, \
@@ -96,10 +106,9 @@ def build_network(input_var, nb_filter=16, \
 
     return last, net, debug
 
-
-def compile_validation(constructor, batch_size=1, psize=300):
+def compile_validation(input_size):
     input_var = T.tensor4("input")
-    network, layers, debug = build_network(input_var, input_size=(batch_size,3,psize,psize))
+    network, layers, debug = build_network(input_var, input_size=input_size)
     test_prediction = nn.layers.get_output(network, deterministic=True)
     val_fn = theano.function([input_var], test_prediction, allow_input_downcast=True)
     return val_fn, network, layers
@@ -108,31 +117,51 @@ class NormalizationNetwork(object):
     """ Inititalizes a new network with a sklearn compatible interface
     """
 
-    def __init__(batch_size = 64,
+    def __init__(self,batch_size = 64,
                  patch_size = tools.INP_PSIZE,
                  fname=None,
-                 debug_connections=False):
-
-        assert len(input_size) == 4,\
-            "Provide a tuple (N,C,W,H) for input_size"
-        assert fname is None or os.path.exists(fname_weights),\
+                 debug_connections=False,
+                 clip = [0, 255]):
+        assert fname is None or os.path.exists(fname),\
             "Provided file name for weights does not exist"
+
         self.batch_size = batch_size
         self.patch_size = patch_size
         self.input_size = (batch_size, 3, patch_size, patch_size)
         self.fname_weights = fname
 
-        val_fn, network, layers   = compile_validation()
+        val_fn, network, layers   = compile_validation(self.input_size)
         self.network       = network
         self.layers        = layers
         self._transform    = val_fn
+        self.clip = clip
 
         self.load_weights(self.fname_weights)
 
         self.output_shape = nn.layers.get_output_shape(self.network)[2:]
 
+    def __str__(self):
+        pass
+
+    def __repr__(self):
+        return "FAN module, {} -> {}".format(self.input_size,\
+                                             self.output_shape)
+
+    def __call__(self, X):
+        return self.transform(X)
+
     def fit(self, X, y=None):
         pass
+
+    def crop(self, X):
+        """
+        Crops and Image to same dimensions as normalized images
+        """
+        _,w,h,_ = X.shape
+        offx = (w - self.output_shape[0]) // 2
+        offy = (h - self.output_shape[1]) // 2
+
+        return X[:,offx:offx+self.output_shape[0],offy:offy+self.output_shape[1],:]
 
     def transform(self, X):
         normed = []
@@ -140,9 +169,12 @@ class NormalizationNetwork(object):
         bsize = self.batch_size
 
         for i in range(0, X.shape[0], bsize):
-            img = dataset[i:i+bsize,...].transpose((0,3,1,2))
-            outp = val_fn(img)
+            img = X[i:i+bsize,...].transpose((0,3,1,2))
+            outp = self._transform(img)
             normed_imgs[i:i+bsize,...] = outp.transpose((0,2,3,1))
+
+        if self.clip is not None:
+            normed_imgs = np.clip(normed_imgs, *self.clip)
 
         return normed_imgs
 

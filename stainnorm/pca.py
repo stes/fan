@@ -1,7 +1,8 @@
 import numpy as np
 from sklearn.decomposition import PCA
-from tools import get_dataset, panelize
 import h5py
+
+from .tools import get_dataset, panelize
 
 def flip(xx, flip_h=True, flip_v=True):
     """ Randomly flip images in a given batch
