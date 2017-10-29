@@ -69,7 +69,7 @@ from lasagne.layers import get_output_shape
 
 from . import layers, tools
 from .layers import fan_module_simple, fan_module_improved
-from .layers import get_features, normalize, transpose, get_resnet50
+from .layers import get_features, normalize, transpose
 from .featurenorm import FeatureAwareNormLayer
 
 __all__ = ['build_baseline1_small',

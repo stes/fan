@@ -1,0 +1,37 @@
+{
+    "learning_rates" : {
+        "conv1_1" : 1e-6,
+        "conv1_2" : 1e-6,
+        
+        "bn1_1" : 1e-3,
+        "bn1_2" : 1e-3,
+        "bn1_3" : 1e-3,
+        "bn"    : 1e-3,
+        "fan"   : 1e-1,
+        "fan1"  : 1e-1,
+        "fan2"  : 1e-1,
+        "bnm1"  : 1e-3,
+        "bnm2"  : 1e-3,
+        "shift" :   1e-3,
+        "scale" :   1e-3,
+        
+        "middle" : 1e-4,
+        
+        "deconv1_2" : 1e-4,
+        "deconv1_1" : 1e-4,
+
+        "default" : 1e-4
+    },
+
+    "penalties" : {
+        "conv1_1" : 1e-4,
+        "conv1_2" : 1e-4,
+        
+        "bn1_1" : 1e-4,
+        "bn1_2" : 1e-4,
+        "middle" : 1e-4,
+        
+        "deconv1_2" : 1e-4,
+        "deconv1_1" : 1e-4
+    }
+}

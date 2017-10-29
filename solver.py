@@ -233,23 +233,26 @@ if __name__ == '__main__':
 
   print("Starting with dataset code {}".format(dataset_code))
 
+  os.makedirs('log', exist_ok=True)
   logger_setup(filename="log/stainnorm.log")
   log = logging.getLogger(__name__)
   log.info("__START__")
+    
+  
 
   modellist =      [build_baseline1_small,                # 1
                     build_baseline2_feats,                # 2
                     build_baseline3_vgg,                  # 3
-                    build_baseline4_lstm,                 # 4
+                    build_baseline4_fan,                 # 4
                     build_baseline5_fan,                  # 5
-                    build_baseline6_lstm_fan,             # 6
-                    build_resnet7_lstm,                   # 7
-                    build_baseline8_lstm_bilinear,        # 8
-                    build_baseline9_lstm_fan_bilinear,    # 9
-                    build_finetuned1_lstm,                #10
-                    build_finetuned2_lstm,                #11
-                    build_big_lstm,                       #12
-                    build_lstm_reworked]                  #13
+                    build_baseline6_fan_fan,             # 6
+                    build_resnet7_fan,                   # 7
+                    build_baseline8_fan_bilinear,        # 8
+                    build_baseline9_fan_fan_bilinear,    # 9
+                    build_finetuned1_fan,                #10
+                    build_finetuned2_fan,                #11
+                    build_big_fan,                       #12
+                    build_fan_reworked]                  #13
 
   joblist = args.model
 

@@ -127,7 +127,7 @@ def get_updates(error, layers, optimizer, learning_rates, lfilter=None):
             params.append(p)
     return updates, params
 
-def get_dataset(fname="data/patches_train_patches_192.hdf5", train_key="H.E.T.", val_key="H.E.T+",
+def get_dataset(fname="data/train_patches_192.hdf5", train_key="H.E.T.", val_key="H.E.T+",
                 val_slides=["47453", "74235"]):
     to_list = lambda x : x if isinstance(x, list) else [x]
     train_key = to_list(train_key)
