@@ -127,7 +127,7 @@ def get_updates(error, layers, optimizer, learning_rates, lfilter=None):
             params.append(p)
     return updates, params
 
-def get_dataset(fname="data/train_patches_192.hdf5", train_key="H.E.T.", val_key="H.E.T+",
+def get_dataset(fname="data/train_patches_192_l0.hdf5", train_key="H.E.T.", val_key="H.E.T+",
                 val_slides=["47453", "74235"]):
     to_list = lambda x : x if isinstance(x, list) else [x]
     train_key = to_list(train_key)
@@ -138,10 +138,17 @@ def get_dataset(fname="data/train_patches_192.hdf5", train_key="H.E.T.", val_key
         for key in list(ds.keys()):
             if not key in val_slides:
                 for lbl in train_key:
-                    X.append(ds[key][lbl][...])
+                    print(ds[key][lbl].shape)
+                    X.append(ds[key][lbl][...,:192,:192])
+                    X.append(ds[key][lbl][...,-192:,:192])
+                    X.append(ds[key][lbl][...,-192:,-192:])
+                    X.append(ds[key][lbl][...,:192,-192:])
             else:
                 for lbl in val_key:
-                    Xv.append(ds[key][lbl][...])
+                    Xv.append(ds[key][lbl][...,:192,:192])
+                    Xv.append(ds[key][lbl][...,-192:,:192])
+                    Xv.append(ds[key][lbl][...,-192:,-192:])
+                    Xv.append(ds[key][lbl][...,:192,-192:])
     X = np.concatenate(X, axis=0)
     Xv = np.concatenate(Xv, axis=0)
     np.random.shuffle(X)

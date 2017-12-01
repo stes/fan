@@ -239,20 +239,21 @@ if __name__ == '__main__':
   log.info("__START__")
     
   
-
+  # list of possible models. Model 13, fan_reworked is the model presented in our paper
+  # feel free to explore other combinations as well
   modellist =      [build_baseline1_small,                # 1
                     build_baseline2_feats,                # 2
                     build_baseline3_vgg,                  # 3
-                    build_baseline4_fan,                 # 4
+                    build_baseline4_fan,                  # 4
                     build_baseline5_fan,                  # 5
-                    build_baseline6_fan_fan,             # 6
-                    build_resnet7_fan,                   # 7
-                    build_baseline8_fan_bilinear,        # 8
-                    build_baseline9_fan_fan_bilinear,    # 9
-                    build_finetuned1_fan,                #10
-                    build_finetuned2_fan,                #11
-                    build_big_fan,                       #12
-                    build_fan_reworked]                  #13
+                    build_baseline6_fan_fan,              # 6
+                    build_resnet7_fan,                    # 7
+                    build_baseline8_fan_bilinear,         # 8
+                    build_baseline9_fan_fan_bilinear,     # 9
+                    build_finetuned1_fan,                 #10
+                    build_finetuned2_fan,                 #11
+                    build_big_fan,                        #12
+                    build_fan_reworked]                   #13
 
   joblist = args.model
 

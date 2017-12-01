@@ -24,6 +24,10 @@ In order to deploy the model, take the following steps
     - extract your image dataset to the data/ folder
     -
 
+```
+THEANO_FLAGS="device=gpu0" python solver.py -m 13 -H 1 -E 1 -T 2 --comment "model_name"
+```
+
 For application of the code, we provide two scrips, ``solver.py`` and ``normalize.py``.
 While the former is used to train the model we propose in the paper, the latter is used to apply a trained model.
 
