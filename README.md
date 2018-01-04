@@ -127,3 +127,7 @@ Normalized:
 ![Image after normalization](docs/img/FAN_HoEoTp_E.jpg)
 
 For an interactive overview, please visit the [project homepage](https://stes.github.io/fan).
+
+## Contact
+
+For any inquiries about the dataset or our work, please contact [Daniel Bug](http://www.lfb.rwth-aachen.de/institute/team/bug) or [Steffen Schneider](http://stes.io).
