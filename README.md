@@ -1,9 +1,13 @@
+[![GitHub license](https://img.shields.io/github/license/stes/fan.svg?style=flat-square)](https://github.com/stes/fan/blob/master/LICENSE)
+
 # Normalization of Histological Stains using Deep Convolutional Features
 
 In this repository we will provide the code for the paper *Normalization of Histological Stains using Deep Convolutional Features*.
 For more information, visit [the project homepage](https://stes.github.io/fan).
 
-The preprint is available at [https://arxiv.org/abs/1708.04099](https://arxiv.org/abs/1708.04099), the final paper will be accessible via [link.springer.com](https://link.springer.com).
+The preprint is available at [arxiv.org/abs/1708.04099](https://arxiv.org/abs/1708.04099), the final paper is available in [Lecture Notes in Computer Science book series](https://link.springer.com/chapter/10.1007/978-3-319-67558-9_16).
+
+A PyTorch implementation featuring several improvements compared to the original architecture is available at [github.com/stes/pytorch-fan](https://github.com/stes/pytorch-fan).
 
 ## Installation
 
@@ -41,6 +45,11 @@ model.fit(X)
 X_normalized = model.transform(X)
 ```
 
+### Dataset
+
+The validation dataset is available at []().
+
+
 ### Further Notes
 
 Please consider that in this repository, we also published several additional
@@ -52,14 +61,19 @@ several setups.
 
 ## Reference
 
-If you use the Feature Aware Normalization module or other parts of the code
-provided here in your own work, please cite the following paper:
+If you use our dataset, the Feature Aware Normalization module or other parts of the code
+provided here in your own work, please cite [our paper](https://arxiv.org/abs/1708.04099):
 
 ```
 @incollection{bug2017context,
-  title={Context-based Normalization of Histological Stains using Deep Convolutional Features},
-  author={Bug, Daniel and Schneider, Steffen and Grote, Anne and Oswald, Eva and Feuerhake, Friedrich and Sch{\"u}ler, Julia and Merhof, Dorit},
-  booktitle={Deep Learning in Medical Image Analysis and Multimodal Learning for Clinical Decision Support},
+  title={Context-based Normalization of Histological Stains
+         using Deep Convolutional Features},
+  author={Bug, Daniel and Schneider, Steffen
+      and Grote, Anne and Oswald, Eva
+      and Feuerhake, Friedrich and Sch{\"u}ler, Julia
+      and Merhof, Dorit},
+  booktitle={Deep Learning in Medical Image Analysis
+             and Multimodal Learning for Clinical Decision Support},
   pages={135--142},
   year={2017},
   publisher={Springer}

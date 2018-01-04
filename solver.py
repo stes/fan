@@ -237,8 +237,8 @@ if __name__ == '__main__':
   logger_setup(filename="log/stainnorm.log")
   log = logging.getLogger(__name__)
   log.info("__START__")
-    
-  
+
+
   # list of possible models. Model 13, fan_reworked is the model presented in our paper
   # feel free to explore other combinations as well
   modellist =      [build_baseline1_small,                # 1
