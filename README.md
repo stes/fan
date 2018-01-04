@@ -11,22 +11,16 @@ A PyTorch implementation featuring several improvements compared to the original
 
 ## Installation
 
-If you quickly want to check out the code, we recommend installation via a [virtualenv]()
-
-For the list of dependencies, have a look at the ``requirements.txt`` file and install packages via
-```
-pip install -f requirements.txt
-```
-
-Depending on your preferences, you might install the package either manually or via ``easy_install``.
+For the list of dependencies, have a look at the ``requirements.txt`` file.
+The exact package versions are most critical for `Lasagne` and `Theano`.
+For all other Python packages, a more recent version is also likely to function.
 
 
 ### Training a model
 
 In order to deploy the model, take the following steps
 
-    - extract your image dataset to the data/ folder
-    -
+- extract your image dataset to the data/ folder
 
 ```
 THEANO_FLAGS="device=gpu0" python solver.py -m 13 -H 1 -E 1 -T 2 --comment "model_name"
@@ -45,9 +39,27 @@ model.fit(X)
 X_normalized = model.transform(X)
 ```
 
+### Using pre-trained models
+
+We provide a pre-trained network fitted to the `HET+` stain, providing relatively strong color output.
+Note that if the tissue distribution of your own data is signficiantly different from ours, the network should be re-trained with a better noise model, as the training objective assumes that all input data was covered by the noise distribution.
+
+For application of a pre-trained network, run
+
+``` python
+model = fan.NormalizationNetwork(fname='weights/171028-weights-dlmia.npz',
+                                patch_size=300,
+                                batch_size=10)
+X_normalized = model.transform(X)
+```
+
+Also have a look at the [Demo Notebook](https://github.com/stes/fan/blob/master/Demo.ipynb) in this repository.
+Please note that since we avoided padding operations in the whole network, the output images will be smaller than the input images. This design choice is due to the fact that whole slide images are in general gigapixel images with sufficient border regions around the main regions of interest.
+
+
 ### Dataset
 
-The validation dataset is available at []().
+The validation dataset is available in this repository under [Releases](https://github.com/stes/fan/releases).
 
 
 ### Further Notes
