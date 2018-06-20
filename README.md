@@ -7,7 +7,7 @@ For more information, visit [the project homepage](https://stes.github.io/fan).
 
 The preprint is available at [arxiv.org/abs/1708.04099](https://arxiv.org/abs/1708.04099), the final paper is available in [Lecture Notes in Computer Science book series](https://link.springer.com/chapter/10.1007/978-3-319-67558-9_16).
 
-A PyTorch implementation featuring several improvements compared to the original architecture is available at [github.com/stes/pytorch-fan](https://github.com/stes/pytorch-fan).
+A PyTorch implementation featuring several improvements compared to the original architecture is available at [github.com/stes/fan-pytorch](https://github.com/stes/fan-pytorch).
 
 ## Installation
 
