@@ -1,3 +1,5 @@
+*On the longer term, we plan to merge the functionality from this repository into the [`salad`](https://github.com/domainadaptation/salad) domain adaptation toolbox. Please approach me (see [contact below](#contact)) if you are interested in contributing related algorithms for stain normalization.*
+
 [![GitHub license](https://img.shields.io/github/license/stes/fan.svg?style=flat-square)](https://github.com/stes/fan/blob/master/LICENSE)
 
 # Normalization of Histological Stains using Deep Convolutional Features
